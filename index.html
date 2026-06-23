@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Quản Lý Phòng Kỹ Thuật v2.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col">
+
+    <header class="bg-gray-800 border-b border-gray-700 px-6 py-4 flex items-center justify-between shadow-lg sticky top-0 z-50">
+        <div class="flex items-center space-x-3">
+            <div class="bg-blue-600 p-2 rounded-lg text-white">
+                <i class="fa-solid fa-screwdriver-wrench text-xl"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-bold tracking-wide text-white">TECHNICAL OPERATIONS</h1>
+                <p class="text-xs text-gray-400">Hệ thống quản lý nội bộ Phòng Kỹ Thuật (Bản cập nhật trực tuyến)</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-6">
+            <div class="text-right hidden md:block">
+                <p class="text-sm font-medium text-gray-200" id="current-time">Đang tải thời gian...</p>
+                <p class="text-xs text-emerald-400 flex items-center justify-end">
+                    <span class="h-2 w-2 rounded-full bg-emerald-400 inline-block mr-1.5 animate-pulse"></span> Đồng bộ cục bộ
+                </p>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-1 flex-col lg:flex-row">
+        <aside class="w-full lg:w-64 bg-gray-800 border-r border-gray-700 p-4 space-y-2">
+            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 mb-3">Chức năng chính</p>
+            <nav class="space-y-1">
+                <a href="#dashboard-section" class="flex items-center space-x-3 px-3 py-2.5 bg-blue-600/20 text-blue-400 rounded-lg font-medium transition-all">
+                    <i class="fa-solid fa-chart-pie w-5 text-center"></i>
+                    <span>Bảng điều khiển</span>
+                </a>
+                <a href="#maintenance-section" class="flex items-center space-x-3 px-3 py-2.5 text-gray-400 hover:bg-gray-700/50 hover:text-gray-200 rounded-lg transition-all">
+                    <i class="fa-solid fa-list-check w-5 text-center"></i>
+                    <span>Sự cố & Bảo trì</span>
+                </a>
+                <a href="#param-section" class="flex items-center space-x-3 px-3 py-2.5 text-gray-400 hover:bg-gray-700/50 hover:text-gray-200 rounded-lg transition-all">
+                    <i class="fa-solid fa-gears w-5 text-center"></i>
+                    <span>Cập nhật Thông số</span>
+                </a>
+            </nav>
+        </aside>
+
+        <main class="flex-1 p-6 space-y-6 overflow-y-auto">
+            
+            <div id="dashboard-section" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-gray-800 p-5 rounded-xl border border-gray-700 flex items-center justify-between shadow-md">
+                    <div>
+                        <p class="text-sm font-medium text-gray-400 uppercase tracking-wider">Tổng số sự cố ghi nhận</p>
+                        <h3 class="text-2xl font-bold text-red-400 mt-1" id="count-tasks">0</h3>
+                    </div>
+                    <div class="bg-red-500/10 p-3 rounded-lg text-red-400">
+                        <i class="fa-solid fa-triangle-exclamation text-2xl"></i>
+                    </div>
+                </div>
+                <div class="bg-gray-800 p-5 rounded-xl border border-gray-700 flex items-center justify-between shadow-md">
+                    <div>
+                        <p class="text-sm font-medium text-gray-400 uppercase tracking-wider">Độ pH hồ bơi hiện tại</p>
+                        <h3 class="text-2xl font-bold text-blue-400 mt-1" id="display-ph">7.5</h3>
+                    </div>
+                    <div class="bg-blue-500/10 p-3 rounded-lg text-blue-400">
+                        <i class="fa-solid fa-droplet text-2xl"></i>
+                    </div>
+                </div>
+                <div class="bg-gray-800 p-5 rounded-xl border border-gray-700 flex items-center justify-between shadow-md">
+                    <div>
+                        <p class="text-sm font-medium text-gray-400 uppercase tracking-wider">Độ cứng nước nồi hơi</p>
+                        <h3 class="text-2xl font-bold text-amber-400 mt-1" id="display-hardness">0 mg/l</h3>
+                    </div>
+                    <div class="bg-amber-500/10 p-3 rounded-lg text-amber-400">
+                        <i class="fa-solid fa-fire text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div id="param-section" class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                <div class="bg-gray-800 p-5 rounded-xl border border-gray-700 xl:col-span-2 shadow-md">
+                    <h3 class="text-lg font-semibold text-white mb-4 flex items-center">
+                        <i class="fa-solid fa-pen-to-square mr-2 text-blue-500"></i> Nhật ký thông số vận hành hàng ngày
+                    </h3>
+                    <form id="param-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-400 uppercase mb-1">Độ pH Hệ Nước / Hồ bơi</label>
+                            <input type="number" step="0.1" id="input-ph" value="7.5" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-400 uppercase mb-1">Độ cứng nước cấp Nồi hơi (mg/l)</label>
+                            <input type="number" id="input-hardness" value="0" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500">
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs font-medium text-gray-400 uppercase mb-1">Trạng thái hệ thống HVAC / Chiller</label>
+                            <input type="text" id="input-hvac" value="Áp suất dầu ổn định, các AHU hoạt động bình thường" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500">
+                        </div>
+                        <div class="sm:col-span-2 text-right">
+                            <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                                <i class="fa-solid fa-floppy-disk mr-1"></i> Lưu thông số hệ thống
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="bg-gray-800 p-5 rounded-xl border border-gray-700 shadow-md flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold text-white mb-4 flex items-center">
+                            <i class="fa-solid fa-user-clock mr-2 text-emerald-500"></i> Trưởng Ca Vận Hành Hôm Nay
+                        </h3>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">Tên Trưởng Ca / Kỹ sư trực:</label>
+                                <input type="text" id="input-leader" value="Kỹ sư Thông" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">Ghi chú bàn giao ca:</label>
+                                <textarea id="input-note" rows="2" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-blue-500">Theo dõi áp suất hệ thống chiller vào giờ cao điểm.</textarea>
+                            </div>
+                            <button onclick="saveShift()" class="w-full bg-blue-600 hover:bg-blue-500 text-white py-1.5 rounded-lg text-xs font-medium transition-colors">
+                                Cập nhật ca trực
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="maintenance-section" class="bg-gray-800 p-5 rounded-xl border border-gray-700 shadow-md space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-700 pb-4">
+                    <h3 class="text-lg font-semibold text-white flex items-center">
+                        <i class="fa-solid fa-list-check mr-2 text-amber-500"></i> Danh sách Sự cố & Bảo trì hiện trường
+                    </h3>
+                    <div id="task-form" class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                        <input type="text" id="task-title" placeholder="Tên sự cố/Hạng mục..." class="bg-gray-700 border border-gray-600 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-blue-500 text-white">
+                        <input type="text" id="task-assignee" placeholder="Người xử lý..." class="bg-gray-700 border border-gray-600 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-blue-500 text-white">
+                        <button onclick="addTask()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-1.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap">
+                            <i class="fa-solid fa-plus mr-1"></i> Thêm phiếu
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm text-gray-300">
+                        <thead class="text-xs uppercase bg-gray-700/40 text-gray-400 border-b border-gray-700">
+                            <tr>
+                                <th class="py-3 px-4">Hạng mục công việc</th>
+                                <th class="py-3 px-4">Phân công</th>
+                                <th class="py-3 px-4 text-right">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="task-table-body" class="divide-y divide-gray-700/50">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <footer class="bg-gray-800 border-t border-gray-700 px-6 py-3 text-center text-xs text-gray-400 flex flex-col sm:flex-row justify-between items-center gap-2">
+        <p>© 2026 Toàn bộ quyền quản lý thuộc Phòng Kỹ Thuật Vận Hành.</p>
+        <p class="text-gray-500">Hỗ trợ lưu trữ LocalStorage v2.0</p>
+    </footer>
+
+    <script>
+        // Cập nhật đồng hồ thời gian thực
+        function updateClock() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            document.getElementById('current-time').innerText = now.toLocaleDateString('vi-VN', options);
+        }
+        setInterval(updateClock, 1000); updateClock();
+
+        // Mẫu dữ liệu mặc định nếu bộ nhớ trống
+        const defaultTasks = [
+            { id: 1, title: 'Xử lý hiện tượng rò rỉ dầu Block AC tầng mái', assignee: 'Đội Nhiệt lạnh' },
+            { id: 2, title: 'Vệ sinh và bảo dưỡng bể Onsen F4 định kỳ', assignee: 'Đội Nước + Nhà thầu' }
+        ];
+
+        // Hàm tải dữ liệu từ LocalStorage khi mở trang web
+        function loadData() {
+            // 1. Tải thông số vận hành
+            const ph = localStorage.getItem('tech_ph') || '7.5';
+            const hardness = localStorage.getItem('tech_hardness') || '0';
+            const hvac = localStorage.getItem('tech_hvac') || 'Áp suất dầu ổn định';
+            const leader = localStorage.getItem('tech_leader') || 'Kỹ sư Thông';
+            const note = localStorage.getItem('tech_note') || 'Theo dõi áp suất hệ thống chiller.';
+
+            document.getElementById('input-ph').value = ph;
+            document.getElementById('display-ph').innerText = ph;
+            document.getElementById('input-hardness').value = hardness;
+            document.getElementById('display-hardness').innerText = hardness + ' mg/l';
+            document.getElementById('input-hvac').value = hvac;
+            document.getElementById('input-leader').value = leader;
+            document.getElementById('input-note').value = note;
+
+            // 2. Tải danh sách sự cố
+            let tasks = JSON.parse(localStorage.getItem('tech_tasks'));
+            if (!tasks) {
+                tasks = defaultTasks;
+                localStorage.setItem('tech_tasks', JSON.stringify(tasks));
+            }
+            renderTasks(tasks);
+        }
+
+        // Hàm hiển thị danh sách sự cố ra bảng html
+        function renderTasks(tasks) {
+            const tbody = document.getElementById('task-table-body');
+            tbody.innerHTML = '';
+            document.getElementById('count-tasks').innerText = tasks.length;
+
+            tasks.forEach(task => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="py-3.5 px-4 font-medium text-gray-200">${task.title}</td>
+                    <td class="py-3.5 px-4 text-gray-400">${task.assignee}</td>
+                    <td class="py-3.5 px-4 text-right">
+                        <button onclick="deleteTask(${task.id})" class="text-xs bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white px-2.5 py-1 rounded transition-colors">
+                            <i class="fa-solid fa-trash-can"></i> Xóa
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Xử lý sự kiện lưu form thông số vận hành
+        document.getElementById('param-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const ph = document.getElementById('input-ph').value;
+            const hardness = document.getElementById('input-hardness').value;
+            const hvac = document.getElementById('input-hvac').value;
+
+            localStorage.setItem('tech_ph', ph);
+            localStorage.setItem('tech_hardness', hardness);
+            localStorage.setItem('tech_hvac', hvac);
+
+            document.getElementById('display-ph').innerText = ph;
+            document.getElementById('display-hardness').innerText = hardness + ' mg/l';
+            alert('Đã lưu thông số kỹ thuật thành công!');
+        });
+
+        // Hàm lưu thông tin ca trực
+        function saveShift() {
+            const leader = document.getElementById('input-leader').value;
+            const note = document.getElementById('input-note').value;
+            localStorage.setItem('tech_leader', leader);
+            localStorage.setItem('tech_note', note);
+            alert('Đã cập nhật nhân sự ca trực thành công!');
+        }
+
+        // Hàm thêm sự cố mới vào bảng dữ liệu
+        function addTask() {
+            const title = document.getElementById('task-title').value.trim();
+            const assignee = document.getElementById('task-assignee').value.trim();
+
+            if (!title || !assignee) {
+                alert('Vui lòng điền đầy đủ Tên sự cố và Người xử lý!');
+                return;
+            }
+
+            let tasks = JSON.parse(localStorage.getItem('tech_tasks')) || [];
+            const newTask = {
+                id: Date.now(), // tạo ID duy nhất bằng timestamp
+                title: title,
+                assignee: assignee
+            };
+
+            tasks.push(newTask);
+            localStorage.setItem('tech_tasks', JSON.stringify(tasks));
+            renderTasks(tasks);
+
+            // Reset ô nhập
+            document.getElementById('task-title').value = '';
+            document.getElementById('task-assignee').value = '';
+        }
+
+        // Hàm xóa sự cố ra khỏi danh sách
+        function deleteTask(id) {
+            if(confirm('Bạn có chắc chắn muốn xóa hạng mục sự cố này không?')) {
+                let tasks = JSON.parse(localStorage.getItem('tech_tasks')) || [];
+                tasks = tasks.filter(task => task.id !== id);
+                localStorage.setItem('tech_tasks', JSON.stringify(tasks));
+                renderTasks(tasks);
+            }
+        }
+
+        // Khởi động chạy tải dữ liệu khi trang web sẵn sàng
+        window.onload = loadData;
+    </script>
+</body>
+</html>
